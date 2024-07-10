@@ -1,6 +1,11 @@
 {
-  "dependencies": {},
+  "dependencies": { "buffer": "^6.0.3", "esbuild": "^0.23.0", "pako": "^2.1.0" },
   "devDependencies": {
-    "@types/node": "^20.14.10"
+    "@types/node": "^20.14.10",
+    "@types/pako": "^2.0.3"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "esbuild ./src/techmino-replay-parser.ts --outdir=dist --bundle --minify"
   }
 }

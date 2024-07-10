@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Techmino Replay Parser Demo</title>
+</head>
+<body>
+    <h1>Techmino Replay Parser Demo</h1>
+    <input type="file" id="input">
+    <button type="button" id="go">Parse!</button>
+    <hr>
+    <p id="output"></p>
+
+    <script src="/dist/techmino-replay-parser.js"></script>
+    <script type="module">
+        /** @type {HTMLInputElement} */
+        const input = document.getElementById('input');
+        const btn = document.getElementById('go');
+        const output = document.getElementById('output');
+
+        const { decompressReplay, parseReplay } = window.TechminoReplayParser;
+
+        async function main() {
+            if(!input) {
+                throw new Error('Input element not found');
+            }
+
+            const file = input.files[0];
+            if (!file) {
+                return;
+            }
+
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = new Uint8Array(arrayBuffer);
+
+            /** @type {Uint8Array} */
+            const decompressed = await decompressReplay(buffer);
+            const parsed = await parseReplay(decompressed);
+
+            output.textContent = JSON.stringify(parsed);
+        }
+
+        btn.addEventListener('click', main);
+    </script>
+</body>
+</html>
