@@ -1,20 +1,27 @@
 import pako from 'pako';
 import { Buffer } from 'buffer';
 
+function dbg(any: any): typeof any {
+    console.debug(any);
+    return any;
+}
+
 export async function decompressReplay(compressed: Buffer): Promise<[Buffer, Buffer]> {
     try {
-        const result = pako.inflate(compressed)
-            .toString()
-            .split(",10,", 2)
-            .map((line: string) =>
-                line.split(",")
-                    .map(Number)
-            )
-            .map((arr: number[]) => Buffer.from(arr))
+        const str = pako.inflate(compressed).toString();
 
-        for (let i = 0; i < result.length; i++) {
-            console.debug(i, result[i]);
-        }
+        const splitIdx = str.indexOf(",10,");
+
+        const sliced = [
+            str.slice(0, splitIdx),
+            str.slice(splitIdx + 4)
+        ];
+
+        const result =
+            sliced.map((line: string) =>
+                line.split(",").map(Number)
+            )
+            .map((arr: number[]) => Buffer.from(arr));
 
         return [result[0], result[1] ?? Buffer.alloc(0)];
     } catch (err) {
@@ -90,7 +97,7 @@ function isKeyValid(key: number): boolean {
     return smallestFiveBits >= 1 && smallestFiveBits <= 20;
 }
 
-export async function parseReplay(replayBuf: Buffer[]): Promise<ReplayData> {
+export async function parseReplay(replayBuf: [Buffer, Buffer]): Promise<ReplayData> {
     const replayData: ReplayData = {inputs: []};
 
     const rawInputPromise = getRawInputs(replayBuf[1]);

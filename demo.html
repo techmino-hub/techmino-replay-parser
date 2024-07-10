@@ -4,12 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Techmino Replay Parser Demo</title>
+    <style>
+        h1, input, button {
+            display: block;
+            text-align: center;
+            margin-inline: auto;
+        }
+
+        button {
+            font-size: 1.15em;
+        }
+    </style>
 </head>
 <body>
     <h1>Techmino Replay Parser Demo</h1>
-    <input type="file" id="input">
+    <input type="file" id="input"> <br>
     <button type="button" id="go">Parse!</button>
     <hr>
+    <p>
+        Result:
+        (<span id="time"></span> ms)
+    </p>
     <p id="output"></p>
 
     <script src="/dist/techmino-replay-parser.js"></script>
@@ -18,10 +33,12 @@
         const input = document.getElementById('input');
         const btn = document.getElementById('go');
         const output = document.getElementById('output');
+        const time = document.getElementById('time');
 
         const { decompressReplay, parseReplay } = window.TechminoReplayParser;
 
         async function main() {
+            const startTime = performance.now();
             if(!input) {
                 throw new Error('Input element not found');
             }
@@ -39,6 +56,7 @@
             const parsed = await parseReplay(decompressed);
 
             output.textContent = JSON.stringify(parsed);
+            time.textContent = (performance.now() - startTime).toFixed(2);
         }
 
         btn.addEventListener('click', main);
