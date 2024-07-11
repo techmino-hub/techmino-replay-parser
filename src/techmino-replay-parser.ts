@@ -86,6 +86,7 @@ export async function parseReplay(replayBuf: [Buffer, Buffer]): Promise<GameRepl
         const eventKey = rawInputs[i + 1];
         
         if(eventKey >= frame || !isKeyValid(eventKey)) {
+            console.log("Invalid key", eventKey, "at frame", frame);
             continue;
         }
 

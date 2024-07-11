@@ -10,7 +10,7 @@ export type GameReplayData = {
     seed: number;
     version: string;
     date: string;
-    mod: string[];
+    mod: [number, number][]; // [mod, value]
     mode: string;
     setting: {
         shakeFX?: number;
