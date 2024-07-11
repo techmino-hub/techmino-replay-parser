@@ -1,10 +1,6 @@
 import pako from 'pako';
 import { Buffer } from 'buffer';
-
-function dbg(any: any): typeof any {
-    console.debug(any);
-    return any;
-}
+import { GameReplayData } from './types';
 
 export async function decompressReplay(compressed: Buffer): Promise<[Buffer, Buffer]> {
     try {
@@ -64,41 +60,13 @@ async function getRawInputs(rep: Buffer): Promise<number[]> {
     return result;
 }
 
-export type ReplayData = {
-    inputs: InputData[];
-    [key: string]: any;
-}
-
-export type InputData = {
-    frame: number;
-    type: "Press" | "Release";
-    key: InputKey;
-}
-
-export enum InputKey {
-    Invalid = 0,
-
-    MoveLeft = 1, MoveRight = 2,
-    RotateRight = 3, RotateLeft = 4, Rotate180 = 5,
-    HardDrop = 6, SoftDrop = 7,
-    Hold = 8,
-
-    Function1 = 9, Function2 = 10,
-    
-    InstantLeft = 11, InstantRight = 12,
-    SonicDrop = 13,
-    Down1 = 14, Down4 = 15, Down10 = 16,
-    LeftDrop = 17, RightDrop = 18,
-    LeftZangi = 19, RightZangi = 20
-}
-
 function isKeyValid(key: number): boolean {
     const smallestFiveBits = key & 0b11111;
     return smallestFiveBits >= 1 && smallestFiveBits <= 20;
 }
 
-export async function parseReplay(replayBuf: [Buffer, Buffer]): Promise<ReplayData> {
-    const replayData: ReplayData = {inputs: []};
+export async function parseReplay(replayBuf: [Buffer, Buffer]): Promise<GameReplayData> {
+    const replayData: Partial<GameReplayData> = {inputs: []};
 
     const rawInputPromise = getRawInputs(replayBuf[1]);
 
@@ -121,14 +89,14 @@ export async function parseReplay(replayBuf: [Buffer, Buffer]): Promise<ReplayDa
             continue;
         }
 
-        replayData.inputs.push({
+        (replayData as GameReplayData).inputs.push({
             frame: frame,
             type: eventKey > 32 ? "Release" : "Press",
             key: eventKey % 32
         });
     }
 
-    return replayData;
+    return replayData as GameReplayData;
 }
 
 if(window) {

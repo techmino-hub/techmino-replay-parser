@@ -55,8 +55,8 @@
             const decompressed = await decompressReplay(buffer);
             const parsed = await parseReplay(decompressed);
 
+            time.textContent = (performance.now() - startTime);
             output.textContent = JSON.stringify(parsed);
-            time.textContent = (performance.now() - startTime).toFixed(2);
         }
 
         btn.addEventListener('click', main);
