@@ -35,7 +35,7 @@
         const output = document.getElementById('output');
         const time = document.getElementById('time');
 
-        const { decompressReplay, parseReplay } = window.TechminoReplayParser;
+        const { parseReplayFromBuffer } = window.TechminoReplayParser;
 
         async function main() {
             const startTime = performance.now();
@@ -51,9 +51,8 @@
             const arrayBuffer = await file.arrayBuffer();
             const buffer = new Uint8Array(arrayBuffer);
 
-            /** @type {Uint8Array} */
-            const decompressed = await decompressReplay(buffer);
-            const parsed = await parseReplay(decompressed);
+            const parsed = await parseReplayFromBuffer(buffer);
+            console.debug(parsed);
 
             time.textContent = (performance.now() - startTime);
             output.textContent = JSON.stringify(parsed);

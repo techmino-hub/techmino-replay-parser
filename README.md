@@ -1,7 +1,7 @@
 # Techmino Replay Parser
 
 A TypeScript parser for Techmino base64-encoded replays.  
-This parser is based on [SweetSea-ButImNotSweet](https://github.com/SweetSea-ButImNotSweet)'s [replay extractor](https://github.com/26F-Studio/Techmino/discussions/1071).
+This parser is based on Techmino's algorithm used to parse the replays, available [here](https://github.com/26F-Studio/Techmino/blob/v0.17.17/parts/data.lua).
 
 ## Building
 
@@ -20,11 +20,9 @@ If in a browser context, it automatically injects its exports into `window.Techm
 
 Sample code is available in the `demo-file.html` and `demo-b64.html` files.
 
-Basically, there are two functions: one for decompressing compressed replay data, and one for parsing the decompressed replay data.  
-
 ```ts
 // Getting replay data from `.rep` file
-import { decompressReplay, parseReplay, type ReplayData } from 'techmino-replay-parser';
+import { parseReplayFromBuffer, type GameReplayData } from 'techmino-replay-parser';
 
 // Binary encoded replay file.
 // It's the one in `(Techmino save dir)/replay/`.
@@ -36,13 +34,8 @@ const arrayBuffer: ArrayBuffer = compressedRepFile.arrayBuffer();
 // Then we convert it to a Uint8Array.
 const buffer = new Uint8Array(arrayBuffer);
 
-// Then we get the decompressed replay data.
-const decompressed = decompressReplay(buffer);
-
-// At this point, `decompressed` is a Buffer array
-// containing a mix of JSON and binary data.
-// We then parse it to get the processed replay data.
-const replayData: ReplayData = parseReplay(decompressed);
+// Then we get the replay data.
+const replayData: GameReplayData = await parseReplayFromBuffer(buffer);
 
 console.log(replayData);
 ```
@@ -50,26 +43,12 @@ console.log(replayData);
 ```ts
 // Getting replay data from pasted base64 string
 // (You can get this by pressing te export button in Techmino's replay list)
-import { decompressReplay, parseReplay, type ReplayData } from 'techmino-replay-parser';
+import { parseReplayFromRepString, type GameReplayData } from 'techmino-replay-parser';
 
 // Base64 encoded replay data.
 const base64Replay: string = '...';
 
-// We first convert it to a Uint8Array.
-const buffer = new Uint8Array(
-    // Convert from base64 to binary
-    atob(base64)
-        .split('')
-        .map((c: string) => c.charCodeAt(0))
-);
-
-// Then we decompress it.
-const decompressed = decompressReplay(buffer);
-
-// At this point, `decompressed` is a Buffer array
-// containing a mix of JSON and binary data.
-// We then parse it to get the processed replay data.
-const replayData: ReplayData = parseReplay(decompressed);
+const replayData: GameReplayData = await parseReplayFromRepString(base64);
 
 console.log(replayData);
 ```
