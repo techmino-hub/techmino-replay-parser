@@ -1,7 +1,19 @@
 import pako from 'pako';
 import { Buffer } from 'buffer';
-import { GameReplayData } from './types';
+import { InputEventType, type GameReplayData } from './types';
 
+/**
+ * Decompresses a replay.  
+ * It can take either the binary contents of a `.rep` file,
+ * or the base64-encoded string you get by exporting a replay from the game.
+ * 
+ * @param compressed
+ * The compressed replay data. Can either be a Buffer or a base64-encoded string.
+ * 
+ * @returns
+ * A tuple containing the decompressed replay data as two Buffers.  
+ * The first Buffer contains the metadata as a JSON, and the second Buffer contains the input data.
+ */
 export async function decompressReplay(compressed: Buffer): Promise<[Buffer, Buffer]> {
     try {
         const str = pako.inflate(compressed).toString();
@@ -25,11 +37,16 @@ export async function decompressReplay(compressed: Buffer): Promise<[Buffer, Buf
     }
 }
 
+/**
+ * Parses the raw input data from a replay using VLQ.  
+ * @param rep The input data buffer.
+ * @returns An array of raw input data.
+ */
 async function getRawInputs(rep: Buffer): Promise<number[]> {
     const decodeVLQ = (buffer: Buffer, startPos: number): [number, number] => {
         let value = 0;
         let position = startPos;
-        let byteValue;
+        let byteValue: number;
 
         do {
             byteValue = buffer[position];
@@ -65,8 +82,13 @@ function isKeyValid(key: number): boolean {
     return smallestFiveBits >= 1 && smallestFiveBits <= 20;
 }
 
+/**
+ * Extracts the replay metadata and input data from the replay buffers, into a structured format.
+ * @param replayBuf The decompressed replay data.
+ * @returns The replay data.
+ */
 export async function parseReplay(replayBuf: [Buffer, Buffer]): Promise<GameReplayData> {
-    const replayData: Partial<GameReplayData> = {inputs: []};
+    let replayData: Partial<GameReplayData> = {inputs: []};
 
     const rawInputPromise = getRawInputs(replayBuf[1]);
 
@@ -86,18 +108,28 @@ export async function parseReplay(replayBuf: [Buffer, Buffer]): Promise<GameRepl
         const eventKey = rawInputs[i + 1];
         
         if(eventKey >= frame || !isKeyValid(eventKey)) {
-            console.log("Invalid key", eventKey, "at frame", frame);
             continue;
         }
 
         (replayData as GameReplayData).inputs.push({
             frame: frame,
-            type: eventKey > 32 ? "Release" : "Press",
+            type: eventKey > 32 ? InputEventType.Release : InputEventType.Press,
             key: eventKey % 32
         });
     }
 
     return replayData as GameReplayData;
+}
+
+/**
+ * Decompresses and parses a replay from a base64-encoded string.
+ * @param replayStr The base64-encoded replay string.
+ * @returns The replay data.
+ */
+export async function parseReplayFromRepString(replayStr: string): Promise<GameReplayData> {
+    const repBuf = Buffer.from(replayStr, "base64");
+    const decompressed = await decompressReplay(repBuf);
+    return await parseReplay(decompressed);
 }
 
 if(window) {
