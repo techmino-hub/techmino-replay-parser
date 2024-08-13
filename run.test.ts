@@ -2,29 +2,35 @@ import { parseReplayFromRepString } from './src/techmino-replay-parser';
 import { type GameReplayData } from './src/types';
 import { readFileSync, readdirSync } from 'fs';
 
-const replayFiles = readdirSync('./tests/replays', {
+const replayFiles = readdirSync('./tests', {
     withFileTypes: false
 }) as string[];
 
 console.log(`Running ${replayFiles.length} tests...`);
 
 const promises: Promise<string>[] = replayFiles.map(async (filename) => {
-    const buf = readFileSync(`./tests/replays/${filename}`).toString('base64');
+    const test = JSON.parse(readFileSync(`./tests/${filename}`).toString()) as Record<string, any>;
 
-    try {
-        const replayObj = await parseReplayFromRepString(buf);
-        
-        const expectedJson = readFileSync(`./tests/expected/${filename}.json`, 'utf8');
-        const expected = JSON.parse(expectedJson) as GameReplayData;
+    const replayStr = test.replay;
+    const expected = test.expected as GameReplayData;
 
-        // check if replayobj contains all the keys and values in expected
-        Object.keys(expected).forEach((key) => {
-            if (expected[key] !== replayObj[key]) {
-                return `FAIL: ${filename} - '${key}' of '${replayObj[key]}' does not match expected '${expected[key]}'`;
-            }
-        });
-    } catch (e) {
-        return `FAIL: ${filename} - ${e}`;
+    const replay = await parseReplayFromRepString(replayStr);
+
+    for(const key in expected) {
+        switch(typeof expected[key]) {
+            case 'number':
+            case 'string':
+            case 'boolean':
+                if (expected[key] !== replay[key]) {
+                    return `FAIL: ${filename} - ${key} is ${replay[key]} but expected ${expected[key]}`;
+                }
+                break;
+            case 'object':
+                if (JSON.stringify(expected[key]) !== JSON.stringify(replay[key])) {
+                    return `FAIL: ${filename} - ${key} is ${JSON.stringify(replay[key])} but expected ${JSON.stringify(expected[key])}`;
+                }
+                break;
+        }
     }
 
     return `PASS: ${filename}`;

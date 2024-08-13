@@ -14,11 +14,11 @@ function decodeVLQ(data: Uint8Array, position: number): [number, number] {
 }
 
 function pumpRecording(data: Uint8Array): GameInputEvent[] {
-    let position = 1;
+    let position = 0;
     const events = [] as GameInputEvent[];
 
     let curFrame = 0;
-    while (position <= data.length) {
+    while (position < data.length) {
         let dt: number, eventKey: number;
         
         [dt, position] = decodeVLQ(data, position);
@@ -52,7 +52,7 @@ export async function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameRepl
 }
 
 export async function parseReplayFromRepString(replayStr: string): Promise<GameReplayData> {
-    const repBuf = Buffer.from(replayStr, "base64");
+    const repBuf = Buffer.from(replayStr.trim(), "base64");
     return await parseReplayFromBuffer(repBuf);
 }
 
