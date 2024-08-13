@@ -2,18 +2,18 @@ import pako from 'pako';
 import { Buffer } from 'buffer';
 import { GameInputEvent, InputEventType, type GameReplayData } from './types';
 
-function decodeVLQ(data: string, position: number): [number, number] {
+function decodeVLQ(data: Uint8Array, position: number): [number, number] {
     let ret = 0;
-    let byte: number;
+    let byte = 0;
     do {
-        byte = data.charCodeAt(position);
+        byte = data[position];
         position++;
         ret = ret * 128 + (byte & 127);
     } while(byte >= 128);
     return [ret, position];
 }
 
-function pumpRecording(data: string) {
+function pumpRecording(data: Uint8Array): GameInputEvent[] {
     let position = 1;
     const events = [] as GameInputEvent[];
 
@@ -46,7 +46,7 @@ export async function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameRepl
     const metadataStr = Buffer.from(metadata).toString();
     const replayData = JSON.parse(metadataStr) as Partial<GameReplayData>;
     
-    replayData.inputs = pumpRecording(Buffer.from(data).toString());
+    replayData.inputs = pumpRecording(Buffer.from(data));
 
     return replayData as GameReplayData;
 }
@@ -56,7 +56,7 @@ export async function parseReplayFromRepString(replayStr: string): Promise<GameR
     return await parseReplayFromBuffer(repBuf);
 }
 
-if(window) {
+if(typeof window !== 'undefined') {
     (window as Record<string, any>).TechminoReplayParser = {
         parseReplayFromBuffer,
         parseReplayFromRepString
