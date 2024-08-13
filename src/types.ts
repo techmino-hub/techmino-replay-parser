@@ -6,6 +6,7 @@
 export type GameReplayData = {
     inputs: GameInputEvent[];
     tasUsed?: boolean;
+    private?: boolean;
     player: string;
     seed: number;
     version: string;
@@ -44,9 +45,9 @@ export type GameReplayData = {
         sddas?: number;
         RS?: string;
         clearFX?: number;
-        [key: string]: any;
+        [key: string]: unknown;
     };
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 /** Represents a single input event in a replay. */
