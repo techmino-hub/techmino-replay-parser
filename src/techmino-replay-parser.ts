@@ -1,6 +1,6 @@
 import pako from 'pako';
 import { Buffer } from 'buffer';
-import { GameInputEvent, InputEventType, type GameReplayData } from './types';
+import { type GameInputEvent, InputEventType, type GameReplayData } from './types';
 
 function decodeVLQ(data: Uint8Array, position: number): [number, number] {
     let ret = 0;
@@ -85,7 +85,9 @@ export async function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameRepl
     const minVersion = [0, 17, 21] as [number, number, number];
     const useAbsoluteTiming = checkMinVersion(minVersion, version);
 
-    replayData.inputs = pumpRecording(Buffer.from(data), useAbsoluteTiming);
+    const buf = Buffer.from(data);
+
+    replayData.inputs = pumpRecording(new Uint8Array(buf), useAbsoluteTiming);
 
     return replayData as GameReplayData;
 }
