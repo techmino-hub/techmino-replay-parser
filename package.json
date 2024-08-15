@@ -1,23 +1,23 @@
 {
   "dependencies": {
     "buffer": "^6.0.3",
-    "esbuild": "^0.23.0",
     "fs": "^0.0.1-security",
     "pako": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
-    "@types/pako": "^2.0.3"
+    "@types/pako": "^2.0.3",
+    "esbuild": "^0.23.0"
   },
   "type": "module",
   "scripts": {
     "build": "npm run build:js && npm run build:types",
-    "build:js": "esbuild ./src/index.ts --outdir=dist --bundle --minify",
-    "build:types": "tsc --emitDeclarationOnly --declaration"
+    "build:js": "esbuild ./src/index.ts --outdir=dist --bundle --minify --format=esm",
+    "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.json"
   },
   "name": "techmino-replay-parser",
-  "description": "A TypeScript parser for Techmino base64-encoded replays.   This parser is based on Techmino's algorithm used to parse the replays, available [here](https://github.com/26F-Studio/Techmino/blob/v0.17.17/parts/data.lua).",
-  "version": "1.0.1",
+  "description": "A TypeScript parser for Techmino base64-encoded replays.",
+  "version": "1.0.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
