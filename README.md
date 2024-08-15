@@ -3,6 +3,9 @@
 A TypeScript parser for Techmino base64-encoded replays.  
 This parser is based on Techmino's algorithm used to parse the replays, available [here](https://github.com/26F-Studio/Techmino/blob/v0.17.17/parts/data.lua).
 
+Credits to [SweetSea](https://github.com/SweetSea-ButImNotSweet) for helping me verify the results using [their own parser written in Python](https://github.com/26F-Studio/Techmino/discussions/1071)!  
+They also helped as a reference for the very early versions before the parser was completely remade, with Techmino's code as a reference.
+
 ## Building
 
 You'll need [Node.js](https://nodejs.org/) (or any Node alternatives) to build this project. (I personally use Bun for its unmatched speed.)  
