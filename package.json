@@ -19,6 +19,13 @@
   "description": "A TypeScript parser for Techmino base64-encoded replays.   This parser is based on Techmino's algorithm used to parse the replays, available [here](https://github.com/26F-Studio/Techmino/blob/v0.17.17/parts/data.lua).",
   "version": "1.0.1",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
   "directories": {
     "test": "tests"
   },
