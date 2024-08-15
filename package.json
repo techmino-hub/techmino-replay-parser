@@ -1,5 +1,10 @@
 {
-  "dependencies": { "buffer": "^6.0.3", "esbuild": "^0.23.0", "fs": "^0.0.1-security", "pako": "^2.1.0" },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "esbuild": "^0.23.0",
+    "fs": "^0.0.1-security",
+    "pako": "^2.1.0"
+  },
   "devDependencies": {
     "@types/node": "^20.14.10",
     "@types/pako": "^2.0.3"
@@ -7,5 +12,26 @@
   "type": "module",
   "scripts": {
     "build": "esbuild ./src/techmino-replay-parser.ts --outdir=dist --bundle --minify"
-  }
+  },
+  "name": "techmino-replay-parser",
+  "description": "A TypeScript parser for Techmino base64-encoded replays.   This parser is based on Techmino's algorithm used to parse the replays, available [here](https://github.com/26F-Studio/Techmino/blob/v0.17.17/parts/data.lua).",
+  "version": "1.0.0",
+  "main": "dist/techmino-replay-parser.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/techmino-hub/techmino-replay-parser.git"
+  },
+  "keywords": [
+    "techmino",
+    "parser"
+  ],
+  "author": "NOT_A_ROBOT",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/techmino-hub/techmino-replay-parser/issues"
+  },
+  "homepage": "https://github.com/techmino-hub/techmino-replay-parser#readme"
 }
