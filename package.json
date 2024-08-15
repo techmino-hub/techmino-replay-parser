@@ -11,12 +11,14 @@
   },
   "type": "module",
   "scripts": {
-    "build": "esbuild ./src/techmino-replay-parser.ts --outdir=dist --bundle --minify"
+    "build": "npm run build:js && npm run build:types",
+    "build:js": "esbuild ./src/index.ts --outdir=dist --bundle --minify",
+    "build:types": "tsc --emitDeclarationOnly --declaration"
   },
   "name": "techmino-replay-parser",
   "description": "A TypeScript parser for Techmino base64-encoded replays.   This parser is based on Techmino's algorithm used to parse the replays, available [here](https://github.com/26F-Studio/Techmino/blob/v0.17.17/parts/data.lua).",
   "version": "1.0.0",
-  "main": "dist/techmino-replay-parser.js",
+  "main": "dist/index.js",
   "directories": {
     "test": "tests"
   },
