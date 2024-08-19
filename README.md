@@ -19,8 +19,6 @@ npm run build
 
 You can grab the TypeScript version in `/src/`, or the JavaScript version in `/dist/`.  
 
-If in a browser context, it automatically injects its exports into `window.TechminoReplayParser`. (Not sure why, but ESBuild doesn't really like to export.)  
-
 Sample code is available in the `demo-file.html` and `demo-b64.html` files.
 
 ```ts
@@ -45,7 +43,7 @@ console.log(replayData);
 
 ```ts
 // Getting replay data from pasted base64 string
-// (You can get this by pressing te export button in Techmino's replay list)
+// (You can get this by pressing the export button in Techmino's replay list)
 import { parseReplayFromRepString, type GameReplayData } from 'techmino-replay-parser';
 
 // Base64 encoded replay data.

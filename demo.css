@@ -1,0 +1,16 @@
+h1, input, textarea, button {
+    display: block;
+    text-align: center;
+    margin-inline: auto;
+}
+
+textarea {
+    text-align: left;
+    width: 40vw;
+    height: 10em;
+    word-break: break-all;
+}
+
+button {
+    font-size: 1.15em;
+}

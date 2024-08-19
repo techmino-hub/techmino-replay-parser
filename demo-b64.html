@@ -4,29 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Techmino Replay Parser Demo</title>
-    <style>
-        h1, textarea, button {
-            display: block;
-            text-align: center;
-            margin-inline: auto;
-        }
-
-        textarea {
-            text-align: left;
-            width: 40vw;
-            height: 10em;
-            word-break: break-all;
-        }
-
-        button {
-            font-size: 1.15em;
-        }
-    </style>
+    <link rel="stylesheet" href="demo.css">
 </head>
 <body>
     <h1>Techmino Replay Parser Demo</h1>
     <textarea type="file" id="input" placeholder="Paste base-64 replay here..."></textarea> <br>
     <button type="button" id="go">Parse!</button>
+    <button type="button" id="bench">Benchmark x1000</button>
     <hr>
     <p>
         Result:
@@ -34,15 +18,17 @@
     </p>
     <p id="output"></p>
 
-    <script src="/dist/techmino-replay-parser.js"></script>
     <script type="module">
+        import { parseReplayFromRepString } from '/dist/index.js';
+
         /** @type {HTMLTextAreaElement} */
         const input = document.getElementById('input');
         const btn = document.getElementById('go');
+        const bench = document.getElementById('bench');
         const output = document.getElementById('output');
         const time = document.getElementById('time');
 
-        const { parseReplayFromRepString } = window.TechminoReplayParser;
+        // const { parseReplayFromRepString } = window.TechminoReplayParser;
 
         async function main() {
             const startTime = performance.now();
@@ -61,7 +47,29 @@
             output.textContent = JSON.stringify(parsed);
         }
 
+        async function benchFn() {
+            const ITERATIONS = 1000;
+            const startTime = performance.now();
+            if(!input) {
+                throw new Error('Input element not found');
+            }
+
+            let base64 = input.value.trim();
+            if (base64.length === 0) {
+                return;
+            }
+
+            let parsed;
+            for(let i = 0; i < ITERATIONS; i++) {
+                parsed = await parseReplayFromRepString(base64);
+            }
+
+            time.textContent = `${ITERATIONS} x ${(performance.now() - startTime) / ITERATIONS}`;
+            output.textContent = JSON.stringify(parsed);
+        }
+
         btn.addEventListener('click', main);
+        bench.addEventListener('click', benchFn);
     </script>
 </body>
 </html>
