@@ -32,7 +32,7 @@ function pumpRecording(data: Uint8Array, absoluteTiming = false): GameInputEvent
         events.push({
             frame: curFrame,
             type: eventKey > 32 ? InputEventType.Release : InputEventType.Press,
-            key: eventKey % 32
+            key: eventKey % 32 as InputKey
         });
     }
     return events;
@@ -104,9 +104,7 @@ if(typeof window !== 'undefined') {
 }
 
 // #region Types
-/**
- * Represents the decompressed replay data as stored in-game.  
- */
+/** Represents the decompressed replay data as stored in-game. */
 export type GameReplayData = {
     inputs: GameInputEvent[];
     tasUsed?: boolean;
@@ -162,26 +160,30 @@ export type GameInputEvent = {
 }
 
 /** Represents the kind of input event. */
-export enum InputEventType {
-    Press = 0,
-    Release = 1
-}
+export const InputEventType = {
+    Press: 0, Release: 1
+} as const;
+
+export type InputEventType = typeof InputEventType[keyof typeof InputEventType];
 
 /** Represents the input button of an input event. */
-export enum InputKey {
-    Invalid = 0,
+export const InputKey = {
+    Invalid: 0,
 
-    MoveLeft = 1, MoveRight = 2,
-    RotateRight = 3, RotateLeft = 4, Rotate180 = 5,
-    HardDrop = 6, SoftDrop = 7,
-    Hold = 8,
+    MoveLeft: 1, MoveRight: 2,
+    RotateRight: 3, RotateLeft: 4, Rotate180: 5,
+    HardDrop: 6, SoftDrop: 7,
+    Hold: 8,
 
-    Function1 = 9, Function2 = 10,
+    Function1: 9, Function2: 10,
     
-    InstantLeft = 11, InstantRight = 12,
-    SonicDrop = 13,
-    Down1 = 14, Down4 = 15, Down10 = 16,
-    LeftDrop = 17, RightDrop = 18,
-    LeftZangi = 19, RightZangi = 20
-}
+    InstantLeft: 11, InstantRight: 12,
+    SonicDrop: 13,
+    Down1: 14, Down4: 15, Down10: 16,
+    LeftDrop: 17, RightDrop: 18,
+    LeftZangi: 19, RightZangi: 20
+} as const;
+
+export type InputKey = typeof InputKey[keyof typeof InputKey];
+
 // #endregion

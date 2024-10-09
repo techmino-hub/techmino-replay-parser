@@ -1,9 +1,7 @@
 import { Buffer } from 'buffer';
 export declare function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameReplayData>;
 export declare function parseReplayFromRepString(replayStr: string): Promise<GameReplayData>;
-/**
- * Represents the decompressed replay data as stored in-game.
- */
+/** Represents the decompressed replay data as stored in-game. */
 export type GameReplayData = {
     inputs: GameInputEvent[];
     tasUsed?: boolean;
@@ -57,31 +55,33 @@ export type GameInputEvent = {
     key: InputKey;
 };
 /** Represents the kind of input event. */
-export declare enum InputEventType {
-    Press = 0,
-    Release = 1
-}
+export declare const InputEventType: {
+    readonly Press: 0;
+    readonly Release: 1;
+};
+export type InputEventType = typeof InputEventType[keyof typeof InputEventType];
 /** Represents the input button of an input event. */
-export declare enum InputKey {
-    Invalid = 0,
-    MoveLeft = 1,
-    MoveRight = 2,
-    RotateRight = 3,
-    RotateLeft = 4,
-    Rotate180 = 5,
-    HardDrop = 6,
-    SoftDrop = 7,
-    Hold = 8,
-    Function1 = 9,
-    Function2 = 10,
-    InstantLeft = 11,
-    InstantRight = 12,
-    SonicDrop = 13,
-    Down1 = 14,
-    Down4 = 15,
-    Down10 = 16,
-    LeftDrop = 17,
-    RightDrop = 18,
-    LeftZangi = 19,
-    RightZangi = 20
-}
+export declare const InputKey: {
+    readonly Invalid: 0;
+    readonly MoveLeft: 1;
+    readonly MoveRight: 2;
+    readonly RotateRight: 3;
+    readonly RotateLeft: 4;
+    readonly Rotate180: 5;
+    readonly HardDrop: 6;
+    readonly SoftDrop: 7;
+    readonly Hold: 8;
+    readonly Function1: 9;
+    readonly Function2: 10;
+    readonly InstantLeft: 11;
+    readonly InstantRight: 12;
+    readonly SonicDrop: 13;
+    readonly Down1: 14;
+    readonly Down4: 15;
+    readonly Down10: 16;
+    readonly LeftDrop: 17;
+    readonly RightDrop: 18;
+    readonly LeftZangi: 19;
+    readonly RightZangi: 20;
+};
+export type InputKey = typeof InputKey[keyof typeof InputKey];

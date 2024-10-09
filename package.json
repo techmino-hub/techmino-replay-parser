@@ -17,7 +17,7 @@
   },
   "name": "techmino-replay-parser",
   "description": "A TypeScript parser for Techmino base64-encoded replays.",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
