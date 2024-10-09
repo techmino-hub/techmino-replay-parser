@@ -1,5 +1,4 @@
-import { parseReplayFromRepString } from './src/techmino-replay-parser';
-import { type GameReplayData } from './src/types';
+import { parseReplayFromRepString, type GameReplayData } from './src/index';
 import { readFileSync, readdirSync } from 'fs';
 
 const replayFiles = readdirSync('./tests', {
@@ -14,22 +13,21 @@ const promises: Promise<string>[] = replayFiles.map(async (filename) => {
     const replayStr = test.replay;
     const expected = test.expected as GameReplayData;
 
-    const replay = await parseReplayFromRepString(replayStr);
+    const result = await parseReplayFromRepString(replayStr);
 
-    for(const key in expected) {
-        switch(typeof expected[key]) {
-            case 'number':
-            case 'string':
-            case 'boolean':
-                if (expected[key] !== replay[key]) {
-                    return `FAIL: ${filename} - ${key} is ${replay[key]} but expected ${expected[key]}`;
-                }
-                break;
-            case 'object':
-                if (JSON.stringify(expected[key]) !== JSON.stringify(replay[key])) {
-                    return `FAIL: ${filename} - ${key} is ${JSON.stringify(replay[key])} but expected ${JSON.stringify(expected[key])}`;
-                }
-                break;
+    for(const key of Object.keys(expected)) {
+        if(typeof result[key] !== typeof expected[key]) {
+            return `FAIL: ${filename} - ${key} is of type ${typeof result[key]}, expected ${typeof expected[key]}`;
+        }
+
+        if(typeof result[key] === 'object' && result[key] !== null) {
+            if(JSON.stringify(expected[key]) !== JSON.stringify(result[key])) {
+                return `FAIL: ${filename} - ${key} is ${JSON.stringify(result[key])} but expected ${JSON.stringify(expected[key])}`;
+            }
+        } else {
+            if (expected[key] !== result[key]) {
+                return `FAIL: ${filename} - ${key} is ${result[key]} but expected ${expected[key]}`;
+            }
         }
     }
 

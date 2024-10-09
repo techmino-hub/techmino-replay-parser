@@ -53,3 +53,22 @@ const replayData: GameReplayData = await parseReplayFromRepString(base64);
 
 console.log(replayData);
 ```
+
+## Testing
+To test this project, simply run the tests with Bun:
+```bash
+bun test
+```
+
+To add a new test case, you can create a new JSON file in `/tests`. Its format is:
+```json
+{
+    "replay": "Insert your replay in base-64 format here. You can simply paste the garbled text you get from exporting a replay to the clipboard.",
+    "expected": {
+        "comment": "The 'expected' object is what you expect out of the parser.",
+        "comment_2": "You can omit fields you don't want to test, like the username.",
+        "comment_3": "The test only checks if whatever you put here, is a *superset* of the object that the parser outputs.",
+        "comment_4": "This means that if the parser outputs more fields than you put here, the test will still pass."
+    }
+}
+```
