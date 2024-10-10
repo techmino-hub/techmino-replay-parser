@@ -310,10 +310,3 @@ export async function parseReplayFromRepString(replayStr: string): Promise<GameR
     const repBuf = Buffer.from(replayStr.trim(), "base64");
     return parseReplayFromBufferSync(repBuf);
 }
-
-if(typeof window !== 'undefined') {
-    (window as Record<string, any>).TechminoReplayParser = {
-        parseReplayFromBuffer,
-        parseReplayFromRepString
-    }
-}
