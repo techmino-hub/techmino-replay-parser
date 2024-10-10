@@ -127,11 +127,11 @@ function encodeVLQ(t: number): number[] {
     t = Math.floor(t / 128);
 
     while (t >= 128) {
-        arr.unshift(t % 128);
+        arr.unshift(128 + t % 128);
         t = Math.floor(t / 128);
     }
 
-    arr.unshift(t);
+    arr.unshift(t + 128);
     return arr;
 }
 
@@ -147,6 +147,22 @@ function decodeVLQ(data: Uint8Array, position: number): [number, number] {
 }
 
 function dumpRecording(list: number[], ptr = 0): Uint8Array {
+    let buffer = [] as number[];
+
+    let prevFrm = list[ptr - 2] ?? 0;
+
+    while(list[ptr]) {
+        const t = list[ptr] - prevFrm;
+        prevFrm = list[ptr];
+        buffer.push(...encodeVLQ(t));
+        buffer.push(...encodeVLQ(list[ptr + 1]));
+        ptr += 2;
+    }
+
+    return new Uint8Array(buffer);
+}
+
+function dumpRecording_0_17_22(list: number[], ptr = 0): Uint8Array {
     let buffer = [] as number[];
 
     while(list[ptr]) {
@@ -219,12 +235,19 @@ export function createReplayBufferSync(
 ): Buffer {
     const metadataStr = JSON.stringify(metadata);
     const metadataBuf = Buffer.from(metadataStr);
+    const version = getVersion(metadata.version ?? "0.0.0");
 
     const list = inputs
         .map((e) => [e.frame, e.key + (e.type === InputEventType.Release ? 32 : 0)])
         .flat();
 
-    const data = dumpRecording(list);
+    // const data = dumpRecording(list);
+    let data: Uint8Array;
+    if(checkMinVersion([0, 17, 22], version)) {
+        data = dumpRecording_0_17_22(list);
+    } else {
+        data = dumpRecording(list);
+    }
 
     const buf = Buffer.concat([metadataBuf, Buffer.from([10]), data]);
     return Buffer.from(pako.deflate(buf));
