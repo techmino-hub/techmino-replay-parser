@@ -265,7 +265,7 @@ export function parseReplayFromBufferSync(replayBuf: Buffer): GameReplayData {
     
     // Replay versions above v0.17.21 use absolute timing
     const version = getVersion(replayData.version ?? "0.0.0");
-    const minVersion = [0, 17, 21] as [number, number, number];
+    const minVersion = [0, 17, 22] as [number, number, number];
     const useAbsoluteTiming = checkMinVersion(minVersion, version);
 
     const buf = Buffer.from(data);
