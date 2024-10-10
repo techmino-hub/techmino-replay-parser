@@ -1,5 +1,5 @@
-import { parseReplayFromRepString, type GameReplayData } from '../src/index';
-import { readFileSync, readdirSync } from 'fs';
+import { parseReplayFromRepString, type GameReplayData } from '../src/index.ts';
+import { readFileSync, readdirSync } from 'node:fs';
 
 const replayFiles = readdirSync('./tests/testcases', {
     withFileTypes: false
