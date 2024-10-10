@@ -1,14 +1,14 @@
-import { parseReplayFromRepString, type GameReplayData } from './src/index';
+import { parseReplayFromRepString, type GameReplayData } from '../src/index';
 import { readFileSync, readdirSync } from 'fs';
 
-const replayFiles = readdirSync('./tests', {
+const replayFiles = readdirSync('./tests/testcases/decode', {
     withFileTypes: false
 }) as string[];
 
 console.log(`Running ${replayFiles.length} tests...`);
 
 const promises: Promise<string>[] = replayFiles.map(async (filename) => {
-    const test = JSON.parse(readFileSync(`./tests/${filename}`).toString()) as Record<string, any>;
+    const test = JSON.parse(readFileSync(`./tests/testcases/decode/${filename}`).toString()) as Record<string, any>;
 
     const replayStr = test.replay;
     const expected = test.expected as GameReplayData;
