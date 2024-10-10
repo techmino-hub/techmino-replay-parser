@@ -8,20 +8,20 @@ const replayFiles = readdirSync('./tests/testcases', {
 console.log(`Running ${replayFiles.length} tests...`);
 
 // Test if parseReplayFromRepString and createReplayStringSync is a NOP
-const promises: Promise<string>[] = replayFiles.map(async (filename) => {
-    const test = JSON.parse(readFileSync(`./tests/testcases/${filename}`).toString()) as Record<string, any>;
+const results: string[] = replayFiles.map((filename) => {
+    const test = JSON.parse(readFileSync(`./tests/testcases/${filename}`).toString()) as Record<string, string>;
 
     const replayStr = test.replay;
-    const parsed = await parseReplayFromRepString(replayStr);
+    const parsed = parseReplayFromRepString(replayStr);
 
     const metadata =
         Object.fromEntries(
             Object.entries(parsed).filter(([key]) => key !== 'inputs')
         ) as GameReplayData;
 
-    const stringified = await createReplayString(metadata, parsed.inputs);
+    const stringified = createReplayString(metadata, parsed.inputs);
 
-    const reparsed = await parseReplayFromRepString(stringified);
+    const reparsed = parseReplayFromRepString(stringified);
 
     if (JSON.stringify(parsed) !== JSON.stringify(reparsed)) {
         return `FAIL: ${filename}\n` +
@@ -34,8 +34,6 @@ const promises: Promise<string>[] = replayFiles.map(async (filename) => {
         return `PASS: ${filename}`;
     }
 });
-
-const results: string[] = await Promise.all(promises);
 
 const fails = results.filter((r) => r.startsWith('FAIL'));
 

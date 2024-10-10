@@ -1,4 +1,5 @@
 import { parseReplayFromRepString, type GameReplayData } from '../src/index.ts';
+import { type Testcase } from './test-common.ts';
 import { readFileSync, readdirSync } from 'node:fs';
 
 const replayFiles = readdirSync('./tests/testcases', {
@@ -7,13 +8,13 @@ const replayFiles = readdirSync('./tests/testcases', {
 
 console.log(`Running ${replayFiles.length} tests...`);
 
-const promises: Promise<string>[] = replayFiles.map(async (filename) => {
-    const test = JSON.parse(readFileSync(`./tests/testcases/${filename}`).toString()) as Record<string, any>;
+const results: string[] = replayFiles.map((filename) => {
+    const test = JSON.parse(readFileSync(`./tests/testcases/${filename}`).toString()) as Testcase;
 
     const replayStr = test.replay;
     const expected = test.expected as GameReplayData;
 
-    const result = await parseReplayFromRepString(replayStr);
+    const result = parseReplayFromRepString(replayStr);
 
     for(const key of Object.keys(expected)) {
         if(typeof result[key] !== typeof expected[key]) {
@@ -33,8 +34,6 @@ const promises: Promise<string>[] = replayFiles.map(async (filename) => {
 
     return `PASS: ${filename}`;
 })
-
-const results: string[] = await Promise.all(promises);
 
 const fails = results.filter((r) => r.startsWith('FAIL'));
 

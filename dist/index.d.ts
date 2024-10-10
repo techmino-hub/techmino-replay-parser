@@ -1,17 +1,35 @@
 import { Buffer } from 'buffer';
-export declare function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameReplayData>;
-export declare function parseReplayFromRepString(replayStr: string): Promise<GameReplayData>;
 /** Represents the decompressed replay data as stored in-game. */
 export type GameReplayData = {
+    /**
+     * A list of input events that occurred during the replay.
+     * Note: does not exist in the raw game metadata.
+     */
     inputs: GameInputEvent[];
+    /** Whether or not the replay is marked as a TAS. */
     tasUsed?: boolean;
-    private?: boolean;
+    /**
+     * The 'private' field of the replay, used to store mode-specific data.
+     * Its contents differ based on the mode played.
+     * Currently, only the `custom_clear` and `custom_puzzle` modes store any data here.
+     */
+    private?: unknown;
+    /** The username of the player. */
     player: string;
+    /** The seed for the random number generator. */
     seed: number;
+    /** The version of the game the replay was made in. */
     version: string;
+    /** The time the replay was initially created. */
     date: string;
+    /**
+     * A list of mods applied to the run.
+     * It's in the format of [mod, value], where mod is the mod ID and value is the value of the mod.
+     */
     mod: [number, number][];
+    /** The name of the mode that was played. */
     mode: string;
+    /** The settings of the game when the run was played. */
     setting: {
         shakeFX?: number;
         splashFX?: number;
@@ -46,12 +64,16 @@ export type GameReplayData = {
         clearFX?: number;
         [key: string]: unknown;
     };
+    /** Additional replay metadata that may not be standard. */
     [key: string]: unknown;
 };
 /** Represents a single input event in a replay. */
 export type GameInputEvent = {
+    /** The frame the input event occured. */
     frame: number;
+    /** The kind of input event (press or release). */
     type: InputEventType;
+    /** The key that was pressed or released. */
     key: InputKey;
 };
 /** Represents the kind of input event. */
@@ -85,3 +107,7 @@ export declare const InputKey: {
     readonly RightZangi: 20;
 };
 export type InputKey = typeof InputKey[keyof typeof InputKey];
+export declare function createReplayBuffer(metadata: GameReplayData, inputs: GameInputEvent[]): Buffer;
+export declare function createReplayString(metadata: GameReplayData, inputs: GameInputEvent[]): string;
+export declare function parseReplayFromBuffer(replayBuf: Buffer): GameReplayData;
+export declare function parseReplayFromRepString(replayStr: string): GameReplayData;

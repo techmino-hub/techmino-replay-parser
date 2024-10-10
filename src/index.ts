@@ -147,7 +147,7 @@ function decodeVLQ(data: Uint8Array, position: number): [number, number] {
 }
 
 function dumpRecording(list: number[], ptr = 0): Uint8Array {
-    let buffer = [] as number[];
+    const buffer = [] as number[];
 
     let prevFrm = list[ptr - 2] ?? 0;
 
@@ -163,7 +163,7 @@ function dumpRecording(list: number[], ptr = 0): Uint8Array {
 }
 
 function dumpRecording_0_17_22(list: number[], ptr = 0): Uint8Array {
-    let buffer = [] as number[];
+    const buffer = [] as number[];
 
     while(list[ptr]) {
         buffer.push(...encodeVLQ(list[ptr]));
@@ -229,7 +229,7 @@ function checkMinVersion(min: [number, number, number], version: [number, number
     return min[2] <= version[2];
 }
 
-export function createReplayBufferSync(
+export function createReplayBuffer(
     metadata: GameReplayData,
     inputs: GameInputEvent[]
 ): Buffer {
@@ -252,29 +252,15 @@ export function createReplayBufferSync(
     return Buffer.from(pako.deflate(buf));
 }
 
-export async function createReplayBuffer(
-    metadata: GameReplayData,
-    inputs: GameInputEvent[]
-): Promise<Buffer> {
-    return createReplayBufferSync(metadata, inputs);
-}
-
-export function createReplayStringSync(
+export function createReplayString(
     metadata: GameReplayData,
     inputs: GameInputEvent[]
 ): string {
-    const buf = createReplayBufferSync(metadata, inputs);
+    const buf = createReplayBuffer(metadata, inputs);
     return buf.toString("base64");
 }
 
-export async function createReplayString(
-    metadata: GameReplayData,
-    inputs: GameInputEvent[]
-): Promise<string> {
-    return createReplayStringSync(metadata, inputs);
-}
-
-export function parseReplayFromBufferSync(replayBuf: Buffer): GameReplayData {
+export function parseReplayFromBuffer(replayBuf: Buffer): GameReplayData {
     const arr = pako.inflate(replayBuf);
 
     const firstNewline = arr.indexOf(10);
@@ -297,16 +283,7 @@ export function parseReplayFromBufferSync(replayBuf: Buffer): GameReplayData {
     return replayData as GameReplayData;
 }
 
-export async function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameReplayData> {
-    return parseReplayFromBufferSync(replayBuf);
-}
-
-export function parseReplayFromRepStringSync(replayStr: string): GameReplayData {
+export function parseReplayFromRepString(replayStr: string): GameReplayData {
     const repBuf = Buffer.from(replayStr.trim(), "base64");
-    return parseReplayFromBufferSync(repBuf);
-}
-
-export async function parseReplayFromRepString(replayStr: string): Promise<GameReplayData> {
-    const repBuf = Buffer.from(replayStr.trim(), "base64");
-    return parseReplayFromBufferSync(repBuf);
+    return parseReplayFromBuffer(repBuf);
 }
