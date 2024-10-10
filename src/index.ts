@@ -14,8 +14,12 @@ export type GameReplayData = {
     /** Whether or not the replay is marked as a TAS. */
     tasUsed?: boolean;
 
-    /** Unknown, but set to false. */
-    private?: boolean;
+    /**
+     * The 'private' field of the replay, used to store mode-specific data.  
+     * Its contents differ based on the mode played.  
+     * Currently, only the `custom_clear` and `custom_puzzle` modes store any data here.
+     */
+    private?: unknown;
 
     /** The username of the player. */
     player: string;
@@ -116,6 +120,21 @@ export const InputKey = {
 export type InputKey = typeof InputKey[keyof typeof InputKey];
 // #endregion
 
+function encodeVLQ(t: number): number[] {
+    if(t < 128) return [t];
+
+    const arr = [t % 128];
+    t = Math.floor(t / 128);
+
+    while (t >= 128) {
+        arr.unshift(t % 128);
+        t = Math.floor(t / 128);
+    }
+
+    arr.unshift(t);
+    return arr;
+}
+
 function decodeVLQ(data: Uint8Array, position: number): [number, number] {
     let ret = 0;
     let byte = 0;
@@ -125,6 +144,17 @@ function decodeVLQ(data: Uint8Array, position: number): [number, number] {
         ret = ret * 128 + (byte & 127);
     } while(byte >= 128);
     return [ret, position];
+}
+
+function dumpRecording(list: number[], ptr = 0): Uint8Array {
+    let buffer = [] as number[];
+
+    while(list[ptr]) {
+        buffer.push(...encodeVLQ(list[ptr]));
+        ptr++;
+    }
+
+    return new Uint8Array(buffer);
 }
 
 function pumpRecording(data: Uint8Array, absoluteTiming = false): GameInputEvent[] {
@@ -183,7 +213,46 @@ function checkMinVersion(min: [number, number, number], version: [number, number
     return min[2] <= version[2];
 }
 
-export async function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameReplayData> {
+export function createReplayBufferSync(
+    metadata: GameReplayData,
+    inputs: GameInputEvent[]
+): Buffer {
+    const metadataStr = JSON.stringify(metadata);
+    const metadataBuf = Buffer.from(metadataStr);
+
+    const list = inputs
+        .map((e) => [e.frame, e.key + (e.type === InputEventType.Release ? 32 : 0)])
+        .flat();
+
+    const data = dumpRecording(list);
+
+    const buf = Buffer.concat([metadataBuf, Buffer.from([10]), data]);
+    return Buffer.from(pako.deflate(buf));
+}
+
+export async function createReplayBuffer(
+    metadata: GameReplayData,
+    inputs: GameInputEvent[]
+): Promise<Buffer> {
+    return createReplayBufferSync(metadata, inputs);
+}
+
+export function createReplayStringSync(
+    metadata: GameReplayData,
+    inputs: GameInputEvent[]
+): string {
+    const buf = createReplayBufferSync(metadata, inputs);
+    return buf.toString("base64");
+}
+
+export async function createReplayString(
+    metadata: GameReplayData,
+    inputs: GameInputEvent[]
+): Promise<string> {
+    return createReplayStringSync(metadata, inputs);
+}
+
+export function parseReplayFromBufferSync(replayBuf: Buffer): GameReplayData {
     const arr = pako.inflate(replayBuf);
 
     const firstNewline = arr.indexOf(10);
@@ -206,9 +275,18 @@ export async function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameRepl
     return replayData as GameReplayData;
 }
 
+export async function parseReplayFromBuffer(replayBuf: Buffer): Promise<GameReplayData> {
+    return parseReplayFromBufferSync(replayBuf);
+}
+
+export function parseReplayFromRepStringSync(replayStr: string): GameReplayData {
+    const repBuf = Buffer.from(replayStr.trim(), "base64");
+    return parseReplayFromBufferSync(repBuf);
+}
+
 export async function parseReplayFromRepString(replayStr: string): Promise<GameReplayData> {
     const repBuf = Buffer.from(replayStr.trim(), "base64");
-    return await parseReplayFromBuffer(repBuf);
+    return parseReplayFromBufferSync(repBuf);
 }
 
 if(typeof window !== 'undefined') {
