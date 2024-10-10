@@ -241,7 +241,6 @@ export function createReplayBufferSync(
         .map((e) => [e.frame, e.key + (e.type === InputEventType.Release ? 32 : 0)])
         .flat();
 
-    // const data = dumpRecording(list);
     let data: Uint8Array;
     if(checkMinVersion([0, 17, 22], version)) {
         data = dumpRecording_0_17_22(list);
