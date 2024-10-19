@@ -15,7 +15,8 @@
     "build": "npm run build:js && npm run build:types",
     "build:js": "esbuild ./src/index.ts --outdir=dist --bundle --minify --format=esm",
     "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.json",
-    "check": "deno lint --ignore=dist,node_modules || deno test -R"
+    "check": "deno lint --ignore=dist,node_modules || deno test -R",
+    "bench": "bun run ./tests/**.bench.{ts,js}"
   },
   "name": "techmino-replay-parser",
   "description": "A TypeScript parser for Techmino base64-encoded replays.",
