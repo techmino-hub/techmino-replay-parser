@@ -1,4 +1,4 @@
-import { parseReplayFromRepString } from '../src/index.ts';
+import { createReplayString, GameReplayData, parseReplayFromRepString } from '../src/index.ts';
 import { readdirSync, readFileSync } from "node:fs";
 import { displayTime, type Testcase } from "./test-common.ts";
 
@@ -14,7 +14,7 @@ const replayFiles = readdirSync('./tests/testcases', {
     withFileTypes: false
 }) as string[];
 
-console.log(`Benchmarking replay decoding with ${replayFiles.length} replays...`);
+console.log(`Benchmarking replay encoding with ${replayFiles.length} replays...`);
 
 const itersPerTest = [
     1,
@@ -41,18 +41,23 @@ for(const filename of replayFiles) {
     process.stdout.write(`Processing: '${filename}'...`);
 
     const replay = testcase.replay;
+    const replayData = parseReplayFromRepString(replay);
+    const metadata =
+        Object.fromEntries(
+            Object.entries(replayData).filter(([key]) => key !== 'inputs')
+        ) as GameReplayData;
+    const inputs = replayData.inputs;
 
     for(const iters of itersPerTest) {
         const startTime = Bun.nanoseconds();
         for(let i = 0; i < iters; i++) {
-            parseReplayFromRepString(replay);
+            createReplayString(metadata, inputs);
         }
         const endTime = Bun.nanoseconds();
-        const replayData = parseReplayFromRepString(replay);
 
         results.push({
             name: filename,
-            gameVer: replayData.version,
+            gameVer: metadata.version,
             strlen: replay.length,
             length: replayData.inputs.length,
             iters,
