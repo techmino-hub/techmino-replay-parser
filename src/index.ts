@@ -120,19 +120,26 @@ export const InputKey = {
 export type InputKey = typeof InputKey[keyof typeof InputKey];
 // #endregion
 
+function log128(t: number): number {
+    return Math.log2(t) / 7;
+}
+
 function encodeVLQ(t: number): number[] {
-    if(t < 128) return [t];
+    if(t < 0x80) return [t];
 
     const arr = [t & 0x7F];
-    t /= 128;
+    arr.length = Math.ceil(log128(t));
+    let index = 1;
+    t /= 0x80;
 
     while (t >= 128) {
-        arr.unshift(128 + t & 0x7F);
+        arr[index] = 128 + t & 0x7F;
         t /= 128;
+        index++;
     }
 
-    arr.unshift(t + 128);
-    return arr;
+    arr[index] = t + 128;
+    return arr.reverse();
 }
 
 function decodeVLQ(data: Uint8Array, position: number): [number, number] {
