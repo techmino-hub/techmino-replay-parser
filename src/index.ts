@@ -123,12 +123,12 @@ export type InputKey = typeof InputKey[keyof typeof InputKey];
 function encodeVLQ(t: number): number[] {
     if(t < 128) return [t];
 
-    const arr = [t % 128];
-    t = Math.floor(t / 128);
+    const arr = [t & 0x7F];
+    t /= 128;
 
     while (t >= 128) {
-        arr.unshift(128 + t % 128);
-        t = Math.floor(t / 128);
+        arr.unshift(128 + t & 0x7F);
+        t /= 128;
     }
 
     arr.unshift(t + 128);
@@ -141,8 +141,8 @@ function decodeVLQ(data: Uint8Array, position: number): [number, number] {
     do {
         byte = data[position];
         position++;
-        ret = ret * 128 + (byte & 127);
-    } while(byte >= 128);
+        ret = ret * 0x80 + (byte & 0x7F);
+    } while(byte >= 0x80);
     return [ret, position];
 }
 
