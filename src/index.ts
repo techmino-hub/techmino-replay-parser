@@ -127,18 +127,18 @@ function log128(t: number): number {
 function encodeVLQ(t: number): number[] {
     if(t < 0x80) return [t];
 
-    const arr = [t & 0x7F];
-    arr.length = Math.ceil(log128(t));
+    const arr = new Array(Math.ceil(log128(t)));
+    arr[0] = t & 0x7F;
     let index = 1;
-    t /= 0x80;
+    t >>>= 7;
 
-    while (t >= 128) {
-        arr[index] = 128 + t & 0x7F;
-        t /= 128;
+    while (t >= 0x80) {
+        arr[index] = 0x80 | t & 0x7F;
+        t >>>= 7;
         index++;
     }
 
-    arr[index] = t + 128;
+    arr[index] = t | 0x80;
     return arr.reverse();
 }
 
