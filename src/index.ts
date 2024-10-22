@@ -143,14 +143,15 @@ function encodeVLQ(t: number): number[] {
 }
 
 function decodeVLQ(data: Uint8Array, position: number): [number, number] {
-    let ret = 0;
+    let result = 0;
     let byte = 0;
     do {
         byte = data[position];
+        result <<= 7;
         position++;
-        ret = ret * 0x80 + (byte & 0x7F);
+        result |= byte & 0x7F;
     } while(byte >= 0x80);
-    return [ret, position];
+    return [result, position];
 }
 
 function dumpRecording(list: number[], ptr = 0): Uint8Array {
