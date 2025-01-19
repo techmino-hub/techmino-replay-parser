@@ -34,3 +34,6 @@ jobs:
 
       - name: Run tests
         run: deno test -R
+
+      - name: Check if dist/ is up-to-date
+        run: ./build-check.sh
