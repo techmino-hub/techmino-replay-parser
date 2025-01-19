@@ -1,4 +1,4 @@
-import { Buffer } from '../node_modules/buffer/index.js';
+import { Buffer } from 'buffer/index.js';
 /** Represents the decompressed replay data as stored in-game. */
 export type GameReplayData = {
     /**

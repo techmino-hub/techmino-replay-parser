@@ -1,6 +1,6 @@
 import pako from 'pako';
-// import { Buffer } from 'npm:buffer';
-import { Buffer } from '../node_modules/buffer/index.js';
+import { Buffer } from 'buffer/index.js';
+// import { Buffer } from '../node_modules/buffer/index.js';
 
 // #region Types
 /** Represents the decompressed replay data as stored in-game. */

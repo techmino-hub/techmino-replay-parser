@@ -7,6 +7,6 @@ await esbuild.build({
     minify: true,
     format: "esm",
     alias: {
-        "npm:buffer": "buffer"
+        "npm:buffer": "./node_modules/buffer/index.js",
     },
 });

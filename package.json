@@ -15,7 +15,7 @@
     "build": "npm run build:js && npm run build:types",
     "build:js": "deno run --allow-env --allow-read --allow-run ./build.ts",
     "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.json",
-    "check": "deno lint --ignore=dist,node_modules || deno test -R",
+    "check": "deno lint --ignore=dist,node_modules; deno test -R",
     "bench": "for file in ./tests/*.bench.ts; do deno run \"$file\"; done"
   },
   "name": "techmino-replay-parser",
