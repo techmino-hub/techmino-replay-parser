@@ -11,8 +11,12 @@ export type GameReplayData = {
      * Note: does not exist in the raw game metadata.
      */
     inputs: GameInputEvent[];
+    /**
+     * The metadata of the replay.
+     */
     metadata: GameReplayMetadata;
 };
+/** Represents the metadata of the replay. */
 export type GameReplayMetadata = {
     /** Whether or not the replay is marked as a TAS. */
     tasUsed?: boolean;
