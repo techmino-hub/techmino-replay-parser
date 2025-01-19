@@ -1,5 +1,5 @@
 import pako from 'pako';
-import { Buffer } from 'buffer';
+import { Buffer } from 'node:buffer';
 
 
 // #region Types
@@ -11,6 +11,10 @@ export type GameReplayData = {
      */
     inputs: GameInputEvent[];
     
+    metadata: GameReplayMetadata;
+}
+
+export type GameReplayMetadata = {
     /** Whether or not the replay is marked as a TAS. */
     tasUsed?: boolean;
 
@@ -238,9 +242,9 @@ function checkMinVersion(min: [number, number, number], version: [number, number
 }
 
 export function createReplayBuffer(
-    metadata: GameReplayData,
-    inputs: GameInputEvent[]
+    replayData: GameReplayData
 ): Buffer {
+    const { metadata, inputs } = replayData;
     const metadataStr = JSON.stringify(metadata);
     const metadataBuf = Buffer.from(metadataStr);
     const version = getVersion(metadata.version ?? "0.0.0");
@@ -256,15 +260,18 @@ export function createReplayBuffer(
         data = dumpRecording(list);
     }
 
-    const buf = Buffer.concat([metadataBuf, Buffer.from([10]), data]);
+    const buf = Buffer.concat([
+        new Uint8Array(metadataBuf),
+        new Uint8Array(Buffer.from([10])),
+        data
+    ]);
     return Buffer.from(pako.deflate(buf));
 }
 
 export function createReplayString(
-    metadata: GameReplayData,
-    inputs: GameInputEvent[]
+    replayData: GameReplayData
 ): string {
-    const buf = createReplayBuffer(metadata, inputs);
+    const buf = createReplayBuffer(replayData);
     return buf.toString("base64");
 }
 
@@ -273,22 +280,23 @@ export function parseReplayFromBuffer(replayBuf: Buffer): GameReplayData {
 
     const firstNewline = arr.indexOf(10);
 
-    const metadata = arr.slice(0, firstNewline);
-    const data = arr.slice(firstNewline + 1);
+    const metadataSlice = arr.slice(0, firstNewline);
+    const inputDataSlice = arr.slice(firstNewline + 1);
 
-    const metadataStr = Buffer.from(metadata).toString();
-    const replayData = JSON.parse(metadataStr) as Partial<GameReplayData>;
+    const metadataStr = Buffer.from(metadataSlice).toString();
+    const metadata = JSON.parse(metadataStr) as GameReplayMetadata;
     
     // Replay versions above v0.17.21 use absolute timing
-    const version = getVersion(replayData.version ?? "0.0.0");
+    const version = getVersion(metadata.version ?? "0.0.0");
     const minVersion = [0, 17, 22] as [number, number, number];
     const useAbsoluteTiming = checkMinVersion(minVersion, version);
 
-    const buf = Buffer.from(data);
+    const buf = Buffer.from(inputDataSlice);
 
-    replayData.inputs = pumpRecording(new Uint8Array(buf), useAbsoluteTiming);
-
-    return replayData as GameReplayData;
+    return {
+        inputs: pumpRecording(new Uint8Array(buf), useAbsoluteTiming),
+        metadata
+    };
 }
 
 export function parseReplayFromRepString(replayStr: string): GameReplayData {

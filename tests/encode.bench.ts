@@ -1,14 +1,9 @@
-import { createReplayString, GameReplayData, parseReplayFromRepString } from '../src/index.ts';
+import { createReplayString, parseReplayFromRepString } from '../src/index.ts';
 import { readdirSync, readFileSync } from "node:fs";
-import { displayTime, type Testcase } from "./test-common.ts";
+import { displayTime, nanoseconds, requestPerms, type Testcase } from "./test-common.ts";
+import process from "node:process";
 
-if(typeof globalThis.Bun === "undefined") {
-    throw "This benchmark needs to be run in Bun: https://bun.sh";
-}
-
-const Bun = globalThis.Bun as {
-    nanoseconds: () => number
-};
+requestPerms(true);
 
 const replayFiles = readdirSync('./tests/testcases', {
     withFileTypes: false
@@ -33,7 +28,7 @@ type BenchResult = {
     durationPerIter: string;
 }
 
-let results = [] as BenchResult[];
+const results = [] as BenchResult[];
 
 for(const filename of replayFiles) {
     const testcase = JSON.parse(readFileSync(`./tests/testcases/${filename}`).toString()) as Testcase;
@@ -42,22 +37,17 @@ for(const filename of replayFiles) {
 
     const replay = testcase.replay;
     const replayData = parseReplayFromRepString(replay);
-    const metadata =
-        Object.fromEntries(
-            Object.entries(replayData).filter(([key]) => key !== 'inputs')
-        ) as GameReplayData;
-    const inputs = replayData.inputs;
 
     for(const iters of itersPerTest) {
-        const startTime = Bun.nanoseconds();
+        const startTime = nanoseconds();
         for(let i = 0; i < iters; i++) {
-            createReplayString(metadata, inputs);
+            createReplayString(replayData);
         }
-        const endTime = Bun.nanoseconds();
+        const endTime = nanoseconds();
 
         results.push({
             name: filename,
-            gameVer: metadata.version,
+            gameVer: replayData.metadata.version,
             strlen: replay.length,
             length: replayData.inputs.length,
             iters,

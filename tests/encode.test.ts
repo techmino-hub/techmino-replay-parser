@@ -1,5 +1,8 @@
-import { parseReplayFromRepString, type GameReplayData, createReplayString } from '../src/index.ts';
+import { parseReplayFromRepString, createReplayString } from '../src/index.ts';
 import { readFileSync, readdirSync } from 'node:fs';
+import { requestPerms } from './test-common.ts';
+
+requestPerms(true);
 
 const replayFiles = readdirSync('./tests/testcases', {
     withFileTypes: false
@@ -14,12 +17,7 @@ const results: string[] = replayFiles.map((filename) => {
     const replayStr = test.replay;
     const parsed = parseReplayFromRepString(replayStr);
 
-    const metadata =
-        Object.fromEntries(
-            Object.entries(parsed).filter(([key]) => key !== 'inputs')
-        ) as GameReplayData;
-
-    const stringified = createReplayString(metadata, parsed.inputs);
+    const stringified = createReplayString(parsed);
 
     const reparsed = parseReplayFromRepString(stringified);
 

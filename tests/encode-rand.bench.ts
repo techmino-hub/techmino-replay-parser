@@ -1,18 +1,12 @@
 import {
     createReplayString,
+    GameReplayMetadata,
     InputKey,
-    type GameInputEvent,
-    type GameReplayData
+    type GameInputEvent
 } from '../src/index.ts';
-import { displayTime, randMaker } from "./test-common.ts";
+import { displayTime, nanoseconds, randMaker, requestPerms } from "./test-common.ts";
 
-if(typeof globalThis.Bun === "undefined") {
-    throw "This benchmark needs to be run in Bun: https://bun.sh";
-}
-
-const Bun = globalThis.Bun as {
-    nanoseconds: () => number
-};
+requestPerms(false);
 
 const lengths = [
     0,
@@ -30,6 +24,13 @@ const versions = [
     "v0.17.21",
 ];
 
+function generateRandomKey(rnd: () => number): InputKey {
+    const index = Math.floor(rnd()*(Object.keys(InputKey).length-1)+1);
+    const key = Object.keys(InputKey)[index] as keyof typeof InputKey;
+
+    return InputKey[key];
+}
+
 function generateInputs(length: number, seed?: number): GameInputEvent[] {
     const rnd = randMaker(seed);
 
@@ -42,7 +43,7 @@ function generateInputs(length: number, seed?: number): GameInputEvent[] {
         list.push({
             frame,
             type: rnd() >= 0.5 ? 1 : 0,
-            key: InputKey[Object.keys(InputKey)[Math.floor(rnd()*(Object.keys(InputKey).length-1)+1)]]
+            key: generateRandomKey(rnd),
         });Math.floor(30 * rnd() + prevFrame)
     }
 
@@ -59,15 +60,20 @@ type BenchResult = {
     microsPerInput: string;
 }
 
-let results = [] as BenchResult[];
+const results = [] as BenchResult[];
 
 for(const length of lengths) {
     const inputs = generateInputs(length);
 
     for(const version of versions) {
-        const startTime = Bun.nanoseconds();
-        const str = createReplayString({version} as GameReplayData, inputs);
-        const endTime = Bun.nanoseconds();
+        const startTime = nanoseconds();
+        const str = createReplayString({
+            metadata: {
+                version
+            } as GameReplayMetadata,
+            inputs
+        });
+        const endTime = nanoseconds();
 
         const duration = endTime - startTime;
         
