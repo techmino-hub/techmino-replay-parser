@@ -8,11 +8,11 @@ They also helped as a reference for the very early versions before the parser wa
 
 ## Building
 
-You'll need [Node.js](https://nodejs.org/) (or any Node alternatives) to build this project. (I personally use Bun for its unmatched speed.)  
+You'll need [Deno](https://deno.com/) to build this project.
 
 ```bash
-npm install
-npm run build
+deno install
+deno run build
 ```
 
 ## Usage
@@ -60,7 +60,7 @@ To test this project, simply run the tests with Bun:
 bun test
 ```
 
-To add a new test case, you can create a new JSON file in `/tests`. Its format is:
+To add a new test case, you can create a new JSON file in `/tests/testcases`. Its format is:
 ```json
 {
     "replay": "Insert your replay in base-64 format here. You can simply paste the garbled text you get from exporting a replay to the clipboard.",

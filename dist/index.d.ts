@@ -1,4 +1,4 @@
-import { Buffer } from 'buffer';
+import { Buffer } from '../node_modules/buffer/index.js';
 /** Represents the decompressed replay data as stored in-game. */
 export type GameReplayData = {
     /**
@@ -6,6 +6,9 @@ export type GameReplayData = {
      * Note: does not exist in the raw game metadata.
      */
     inputs: GameInputEvent[];
+    metadata: GameReplayMetadata;
+};
+export type GameReplayMetadata = {
     /** Whether or not the replay is marked as a TAS. */
     tasUsed?: boolean;
     /**
@@ -107,7 +110,7 @@ export declare const InputKey: {
     readonly RightZangi: 20;
 };
 export type InputKey = typeof InputKey[keyof typeof InputKey];
-export declare function createReplayBuffer(metadata: GameReplayData, inputs: GameInputEvent[]): Buffer;
-export declare function createReplayString(metadata: GameReplayData, inputs: GameInputEvent[]): string;
+export declare function createReplayBuffer(replayData: GameReplayData): Buffer;
+export declare function createReplayString(replayData: GameReplayData): string;
 export declare function parseReplayFromBuffer(replayBuf: Buffer): GameReplayData;
 export declare function parseReplayFromRepString(replayStr: string): GameReplayData;

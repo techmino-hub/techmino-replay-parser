@@ -13,14 +13,14 @@
   "type": "module",
   "scripts": {
     "build": "npm run build:js && npm run build:types",
-    "build:js": "esbuild ./src/index.ts --outdir=dist --bundle --minify --format=esm",
+    "build:js": "deno run --allow-env --allow-read --allow-run ./build.ts",
     "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.json",
     "check": "deno lint --ignore=dist,node_modules || deno test -R",
-    "bench": "for file in ./tests/*.bench.ts; do bun run \"$file\"; done"
+    "bench": "for file in ./tests/*.bench.ts; do deno run \"$file\"; done"
   },
   "name": "techmino-replay-parser",
   "description": "A TypeScript parser for Techmino base64-encoded replays.",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

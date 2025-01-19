@@ -9,7 +9,10 @@
     "strict": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-    "declaration": true
+    "declaration": true,
+    "paths": {
+      "npm:buffer": ["./node_modules/buffer/index.d.ts", "./node_modules/buffer/index.js"],
+    }
   },
   "include": ["src/**/*.ts", "src/techmino-replay-parser.js"],
 }

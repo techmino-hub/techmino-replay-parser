@@ -32,8 +32,14 @@ jobs:
         run: deno lint --ignore=dist,node_modules
         continue-on-error: true
 
-      - name: Run tests
+      - name: Test using Deno
         run: deno test -R
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Test using Bun
+        run: bun test
 
       - name: Check if dist/ is up-to-date
         run: ./build-check.sh
