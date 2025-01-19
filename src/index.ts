@@ -246,7 +246,9 @@ export function createReplayBuffer(
 ): Buffer {
     const { metadata, inputs } = replayData;
     const metadataStr = JSON.stringify(metadata);
-    const metadataBuf = Buffer.from(metadataStr);
+    // const metadataBuf = Uint8Array.from(metadataStr);
+    const metadataU8Arr = new TextEncoder().encode(metadataStr);
+    
     const version = getVersion(metadata.version ?? "0.0.0");
 
     const list = inputs
@@ -260,12 +262,19 @@ export function createReplayBuffer(
         data = dumpRecording(list);
     }
 
+    // const buf = Buffer.concat([
+    //     metadataBuf,
+    //     Buffer.from([10]),
+    //     data
+    // ]);
+
     const buf = Buffer.concat([
-        new Uint8Array(metadataBuf),
-        new Uint8Array(Buffer.from([10])),
+        metadataU8Arr,
+        new Uint8Array([10]),
         data
     ]);
-    return Buffer.from(pako.deflate(buf));
+
+    return Buffer.from(pako.deflate(buf as unknown as Uint8Array));
 }
 
 export function createReplayString(
@@ -276,7 +285,7 @@ export function createReplayString(
 }
 
 export function parseReplayFromBuffer(replayBuf: Buffer): GameReplayData {
-    const arr = pako.inflate(replayBuf);
+    const arr: Uint8Array = pako.inflate(replayBuf as unknown as Uint8Array);
 
     const firstNewline = arr.indexOf(10);
 
@@ -291,10 +300,8 @@ export function parseReplayFromBuffer(replayBuf: Buffer): GameReplayData {
     const minVersion = [0, 17, 22] as [number, number, number];
     const useAbsoluteTiming = checkMinVersion(minVersion, version);
 
-    const buf = Buffer.from(inputDataSlice);
-
     return {
-        inputs: pumpRecording(new Uint8Array(buf), useAbsoluteTiming),
+        inputs: pumpRecording(inputDataSlice, useAbsoluteTiming),
         metadata
     };
 }
