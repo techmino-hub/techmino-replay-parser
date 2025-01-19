@@ -1,14 +1,18 @@
 import pako from 'pako';
 import * as BufferPkg from 'buffer/index.js';
 
+/**
+ * Buffer object forced to be the one from the NPM package because Bun likes to override it
+ */
 const Buffer = await (async () => {
     if ('Bun' in globalThis) {
-        // Bun decides to be "clever" and injects its own implementation which we don't want
         const PATHS_TO_CHECK = [
             '../node_modules/buffer/index.js',
             '../buffer/index.js',
         ];
-        return (await Promise.any(PATHS_TO_CHECK.map(path => import(path).then(m => m.Buffer))));
+        return (await Promise.any(
+            PATHS_TO_CHECK.map(path => import(path).then(m => m.Buffer))
+        ).catch(() => BufferPkg.Buffer));
     } else {
         return BufferPkg.Buffer;
     }

@@ -1,4 +1,9 @@
-import { Buffer } from 'buffer/index.js';
+import * as BufferPkg from 'buffer/index.js';
+/**
+ * Buffer object forced to be the one from the NPM package because Bun likes to override it
+ */
+declare const Buffer: typeof BufferPkg.Buffer;
+type Buffer = BufferPkg.Buffer;
 /** Represents the decompressed replay data as stored in-game. */
 export type GameReplayData = {
     /**
@@ -114,3 +119,4 @@ export declare function createReplayBuffer(replayData: GameReplayData): Buffer;
 export declare function createReplayString(replayData: GameReplayData): string;
 export declare function parseReplayFromBuffer(replayBuf: Buffer): GameReplayData;
 export declare function parseReplayFromRepString(replayStr: string): GameReplayData;
+export {};

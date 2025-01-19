@@ -14,7 +14,7 @@
   "scripts": {
     "build": "npm run build:js && npm run build:types",
     "build:js": "deno run --allow-env --allow-read --allow-run ./build.ts",
-    "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.json",
+    "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.json --module es2020 --lib es2021",
     "check": "deno lint --ignore=dist,node_modules; deno test -R",
     "bench": "for file in ./tests/*.bench.ts; do deno run \"$file\"; done"
   },
