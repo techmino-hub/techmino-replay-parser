@@ -6,6 +6,31 @@ This parser is based on Techmino's algorithm used to parse the replays, availabl
 Credits to [SweetSea](https://github.com/SweetSea-ButImNotSweet) for helping me verify the results using [their own parser written in Python](https://github.com/26F-Studio/Techmino/discussions/1071)!  
 They also helped as a reference for the very early versions before the parser was completely remade, with Techmino's code as a reference.
 
+## Installing
+
+To install into your project, do one of the following depending on your package manager of choice:
+
+Node.js/npm:
+```
+npm install techmino-replay-parser
+```
+
+Deno:
+```
+deno install npm:techmino-replay-parser
+```
+
+Bun:
+```
+bun install techmino-replay-parser
+```
+
+## Demo
+
+Try out the interactive demo here:  
+https://techmino-hub.github.io/techmino-replay-parser/demo-b64
+https://techmino-hub.github.io/techmino-replay-parser/demo-file
+
 ## Building
 
 You'll need [Deno](https://deno.com/) to build this project.
